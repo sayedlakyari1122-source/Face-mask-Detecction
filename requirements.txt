@@ -3,3 +3,5 @@ opencv-python
 tensorflow>=2.18.0
 numpy
 Pillow
+libgl1-mesa-glx
+libglib2.0-0
