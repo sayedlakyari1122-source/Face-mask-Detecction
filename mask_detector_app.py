@@ -2,6 +2,7 @@ import streamlit as st
 import cv2
 import numpy as np
 from tensorflow import keras
+from tensorflow.keras import layers
 from PIL import Image
 import tempfile
 
@@ -50,7 +51,25 @@ st.markdown("""
 # Load model
 @st.cache_resource
 def load_model():
-    model = keras.models.load_model('keras_model.h5', compile=False)
+    # Custom deserialization config to handle TF version compatibility
+    # This removes the 'groups' parameter that's not recognized in newer TF versions
+    class CustomDepthwiseConv2D(layers.DepthwiseConv2D):
+        def __init__(self, **kwargs):
+            # Remove 'groups' parameter if present (not used in DepthwiseConv2D)
+            kwargs.pop('groups', None)
+            super().__init__(**kwargs)
+    
+    custom_objects = {'DepthwiseConv2D': CustomDepthwiseConv2D}
+    
+    try:
+        model = keras.models.load_model('keras_model.h5', 
+                                       custom_objects=custom_objects,
+                                       compile=False)
+    except Exception as e:
+        # Fallback: try loading with default settings
+        st.warning(f"Using fallback loading method: {str(e)[:100]}")
+        model = keras.models.load_model('keras_model.h5', compile=False)
+    
     return model
 
 # Load labels
