@@ -208,7 +208,7 @@ def main():
             
             with col1:
                 st.markdown("**Original Image**")
-                st.image(image, use_container_width=True)
+                st.image(image, use_column_width=True)
             
             # Make prediction
             preprocessed = preprocess_image(img_array)
